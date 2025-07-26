@@ -36,39 +36,12 @@ pipeline {
                 sh 'mvn package'
             }
         }
-        
-        stage('Remote Docker Build') {
-            steps {
-                sshagent(['docker-ssh']) {
-                    sh '''
-                    ssh -o StrictHostKeyChecking=no ubuntu@65.2.188.138 '
-                    cd ~/myapp &&
-                    docker build -t bankingapp:latest .
-                    '
-                    '''
+       Stage('build docker image') {
+           steps{
+                script{
+                    sh 'docker build -t king094/banking-project:v1.0.0 .'
                 }
-            }
-        }
-        
-        stage('Expose Port via Docker') {
-            steps {
-                echo 'Running Docker container and exposing port...'
-                sh 'docker run -dt -p 8091:8091 --name c000 myimg'
-            }
-        }
-    }
-
-    post {
-        success {
-            echo 'Pipeline completed successfully.'
-        }
-        
-        failure {
-            echo 'Pipeline failed. Check logs for details.'
-        }
-
-        always {
-            echo 'Cleaning up resources if needed.'
-        }
+           }
+       }
     }
 }
