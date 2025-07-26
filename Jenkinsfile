@@ -30,7 +30,15 @@ pipeline{
         }
         stage('run dockerfile'){
           steps{
-               sh 'docker build -t myimg .'
+              stage('remote docker build')
+              steps{
+                  sshagent(['docker-ssh-key']){
+                      sh '''
+                      ssh -o StrictHostKeyChecking=no ubuntu@65.2.188.138 '
+                      cd ~/myapp &&
+                      docker-build -t bankingapp:latest .
+                      '
+                      '''
            }
          }
         stage('port expose'){
