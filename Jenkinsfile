@@ -67,8 +67,7 @@ pipeline {
                 script {
                     echo 'Deploying Docker image using Ansible playbook...'
                     sh """
-                        cd ansible
-                        ansible-playbook -i ansible-playbook.yml
+                       ansible-playbook -i ansible-playbook.yml
                     """
                 }
             }
