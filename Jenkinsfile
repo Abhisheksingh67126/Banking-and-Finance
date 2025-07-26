@@ -57,7 +57,6 @@ pipeline {
          stage('push to dockerhub'){    
              steps{
                 script {
-                     sh 'echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin'
                      sh 'docker push king094/banking-project:v1.0.0'
                 } 
             }
