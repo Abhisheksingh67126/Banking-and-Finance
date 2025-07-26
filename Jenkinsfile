@@ -39,7 +39,7 @@ pipeline {
         
         stage('Remote Docker Build') {
             steps {
-                sshagent(['docker-ssh-key']) {
+                sshagent(['docker-ssh']) {
                     sh '''
                     ssh -o StrictHostKeyChecking=no ubuntu@65.2.188.138 '
                     cd ~/myapp &&
