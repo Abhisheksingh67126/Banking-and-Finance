@@ -1,0 +1,27 @@
+stage('Provision EC2 Instance with Terraform') {
+    steps {
+        dir(env.TERRAFORM_DIR) {
+            sh '''
+                terraform init
+                terraform apply -auto-approve
+            '''
+            script {
+                def instance_ip = sh(script: 'terraform output -raw instance_ip', returnStdout: true).trim()
+                echo "New EC2 instance IP: ${instance_ip}"
+                writeFile file: 'instance_ip.txt', text: instance_ip
+            }
+        }
+    }
+}
+
+stage('Deploy Docker Image Using Ansible') {
+    steps {
+        script {
+            def instance_ip = readFile('instance_ip.txt').trim()
+            sh """
+                sed -i 's/remote-machine-ip/${instance_ip}/' ${INVENTORY_FILE}
+                ansible-playbook -i ${INVENTORY_FILE} ${ANSIBLE_PLAYBOOK} --extra-vars "docker_image=king094/banking-project:v1.0.0"
+            """
+        }
+    }
+}
