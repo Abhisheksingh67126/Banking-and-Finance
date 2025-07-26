@@ -43,6 +43,25 @@ pipeline {
                     sh 'sudo docker build -t king094/banking-project:v1.0.0 .'
                 }
            }
+        stage('login to dockerhub') {
+            steps{
+                script {
+                        // Directly retrieve Docker Hub credentials from Jenkins credentials store
+                        withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        echo 'Logging into Docker Hub...'
+                        sh '''
+                            echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin
+                        '''
+                }
+            }
+         stage('push to dockerhub'){    
+             steps{
+                script {
+                     sh 'echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin'
+                     sh 'docker push king094/banking-project:v1.0.0'
+                } 
+            }
+         }
        }
     }
 }
