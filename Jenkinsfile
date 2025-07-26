@@ -40,7 +40,7 @@ pipeline {
         stage('build docker image') {
            steps{
                 script{
-                    sh 'docker build -t king094/banking-project:v1.0.0 .'
+                    sh 'sudo docker build -t king094/banking-project:v1.0.0 .'
                 }
            }
        }
