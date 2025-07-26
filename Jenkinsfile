@@ -36,7 +36,8 @@ pipeline {
                 sh 'mvn package'
             }
         }
-       Stage('build docker image') {
+        
+        stage('build docker image') {
            steps{
                 script{
                     sh 'docker build -t king094/banking-project:v1.0.0 .'
