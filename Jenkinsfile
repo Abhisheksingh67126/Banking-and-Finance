@@ -62,5 +62,16 @@ pipeline {
                 }
             }
         }
+        stage('Deploy Docker Image via Ansible') {
+            steps {
+                script {
+                    echo 'Deploying Docker image using Ansible playbook...'
+                    sh """
+                        cd ansible
+                        ansible-playbook -i ansible-playbook.yml
+                    """
+                }
+            }
+        }
     }
 }
