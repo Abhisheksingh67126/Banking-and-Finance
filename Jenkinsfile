@@ -59,18 +59,18 @@ pipeline {
         }
     }
         stage('push to dockerhub'){
-            steps{
-                sshagent(['my-ssh-key']) {
-                    withCredentials([string(credentialsId: 'docker-hub-password', variable: 'DOCKER_PASSWORD')]) {
-                    sh '''
-                        ssh -o StrictHostKeyChecking=no ubuntu@13.126.118.224 '
-                        echo "$DOCKER_PASSWORD" | docker login -u "king094" --password-stdin &&
-                        docker push king094/banking-and-finance:v1.0.0 &&
-                        docker logout
-                        '
-                        '''
+            steps{sshagent(['my-ssh-key']) {
+                withCredentials([string(credentialsId: 'docker-hub-password', variable: 'DOCKER_PASSWORD')]) {
+                sh '''
+                ssh -o StrictHostKeyChecking=no ubuntu@13.126.118.224 bash -c "'
+                echo \\"$DOCKER_PASSWORD\\" | docker login -u king094 --password-stdin &&
+                docker push king094/banking-and-finance:v1.0.0 &&
+                docker logout
+            '"
+        '''
     }
 }
+
 }
     }
 }
