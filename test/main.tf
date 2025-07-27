@@ -4,6 +4,8 @@ resource "aws_instance" "test-POC" {
   key_name               = "KEY-PAIR-POC"
   subnet_id              = "subnet-0c10b167ed2ac1307"
   vpc_security_group_ids = ["sg-02fbc5cfbc10f52ef"]
+  associate_public_ip_address = true
+
 
   tags = {
     Name = "Test-POC"
