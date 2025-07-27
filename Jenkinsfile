@@ -1,18 +1,17 @@
 pipeline {
     agent any
 
-
     environment {
-        // This assumes 'aws-credentials' is of type "AWS Credentials ooo"
-        AWS_ACCESS_KEY_ID     = credentials('aws-credentials')
-        AWS_SECRET_ACCESS_KEY = credentials('aws-credentials')
+        DOCKER_IMAGE = 'king094/banking-and-finance:v1.0.0'
+        DOCKER_REMOTE_DIR = '/home/ubuntu/app'
+        TERRAFORM_REMOTE_DIR = '/home/ubuntu/terraform'
+        ANSIBLE_REMOTE_DIR = '/home/ubuntu/ansible'
     }
 
     stages {
-        stage('Checkout the Code from GitHub') {
+        stage('Checkout Code') {
             steps {
                 git url: 'https://github.com/Abhisheksingh67126/Banking-and-Finance', branch: 'master'
-                echo 'Checked out repository.'
             }
         }
 
@@ -45,43 +44,44 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t king094/banking-and-finance:v1.0.0 .'
-            }
-        }
-
-        stage('Login to DockerHub') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials',
-                                                  usernameVariable: 'DOCKER_USERNAME',
-                                                  passwordVariable: 'DOCKER_PASSWORD')]) {
-                    sh 'echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin'
+                sshagent(['my-ssh-key']) {
+                    sh "scp -r ./ ubuntu@docker-builder.example.com:${DOCKER_REMOTE_DIR}"
+                    sh "ssh ubuntu@docker-builder.example.com 'cd ${DOCKER_REMOTE_DIR} && docker build -t ${DOCKER_IMAGE} .'"
                 }
             }
         }
 
-        stage('Push Docker Image') {
+        stage('Push Docker Image To Docker-Hub') {
             steps {
-                sh 'docker push king094/banking-and-finance:v1.0.0'
-            }
-        }
-
-        stage('Create Test Infrastructure (Terraform)') {
-            steps {
-                dir('test') {
-                    sh 'chmod 600 KEY-PAIR-POC.pem'
-                    sh 'terraform init'
-                    sh 'terraform validate'
-                    sh 'terraform apply --auto-approve'
+                sshagent(['my-ssh-key']) {
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh """
+                        ssh ubuntu@docker-builder.example.com '
+                            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin && \
+                            docker push ${DOCKER_IMAGE} && \
+                            docker logout
+                        '
+                        """
+                    }
                 }
             }
         }
 
-        stage('Ansible Deployment') {
+        stage('Terraform Apply') {
             steps {
-                ansiblePlaybook credentialsId: 'AnsibleCred',
-                                disableHostKeyChecking: true,
-                                inventory: 'test/Inventory',
-                                playbook: 'ansible-playbook.yml'
+                sshagent(['my-ssh-key']) {
+                    sh "scp -r ./test ubuntu@terraform-node.example.com:${TERRAFORM_REMOTE_DIR}"
+                    sh "ssh ubuntu@terraform-node.example.com 'cd ${TERRAFORM_REMOTE_DIR} && terraform init && terraform apply -auto-approve'"
+                }
+            }
+        }
+
+        stage('Run Ansible Playbook') {
+            steps {
+                sshagent(['my-ssh-key']) {
+                    sh "scp -r ./ ubuntu@ansible-node.example.com:${ANSIBLE_REMOTE_DIR}"
+                    sh "ssh ubuntu@ansible-node.example.com 'cd ${ANSIBLE_REMOTE_DIR} && ansible-playbook -i test/Inventory ansible-playbook.yml'"
+                }
             }
         }
     }
