@@ -41,13 +41,6 @@ pipeline {
                 sh 'mvn package'
             }
         }
-        stage('Test SSH to Docker Host') {
-            steps {
-                sshagent(['my-ssh-key']) {
-                    sh 'ssh -o StrictHostKeyChecking=no ubuntu@13.126.118.224 "echo Connected successfully!"'
-                }
-            }
-        }
 
         stage('Build Docker Image') {
             steps {
