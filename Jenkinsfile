@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Checkout the Code from GitHub') {
             steps {
-                git url: 'https://github.com/Abhisheksingh67126/your-repo-name.git'
+                git url: 'https://github.com/Abhisheksingh67126/Banking-and-Finance'
                 echo 'Code checked out from GitHub.'
             }
         }
@@ -39,8 +39,8 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                echo 'Building Docker image: king094/medicure:v1.0.0'
-                sh 'docker build -t king094/medicure:v1.0.0 .'
+                echo 'Building Docker image: king094/Banking-and-Finance:v1.0.0'
+                sh 'docker build -t king094/Banking-and-Finance:v1.0.0 .'
             }
         }
 
@@ -57,15 +57,15 @@ pipeline {
 
         stage('Push to DockerHub') {
             steps {
-                echo 'Pushing Docker image: king094/medicure:v1.0.0'
-                sh 'docker push king094/medicure:v1.0.0'
+                echo 'Pushing Docker image: king094/Banking-and-Finance:v1.0.0'
+                sh 'docker push king094/Banking-and-Finance:v1.0.0'
             }
         }
 
         stage('Run Test Pipeline from YAML') {
             steps {
                 script {
-                    def testPipeline = readYaml file: 'test/jenkins.yml'
+                    def testPipeline = readYaml file: 'Jenkinsfile.yml'
                     echo "Loaded test pipeline config: ${testPipeline}"
                 }
             }
@@ -73,7 +73,7 @@ pipeline {
 
         stage('Create Infrastructure') {
             steps {
-                dir('med-pro') {
+                dir('test') {
                     echo 'Creating infrastructure with Terraform...'
                     sh 'chmod 600 keypair-.pem'
                     sh 'terraform init'
@@ -87,7 +87,7 @@ pipeline {
             steps {
                 ansiblePlaybook credentialsId: 'AnsibleCred',
                                 disableHostKeyChecking: true,
-                                inventory: 'Inventory',
+                                inventory: 'test/Inventory',
                                 playbook: 'ansible-playbook.yml'
             }
         }
