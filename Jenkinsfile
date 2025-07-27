@@ -39,8 +39,8 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                echo 'Building Docker image: king094/Banking-and-Finance:v1.0.0'
-                sh 'docker build -t king094/Banking-and-Finance:v1.0.0 .'
+                echo 'Building Docker image: king094/banking-and-finance:v1.0.0'
+                sh 'docker build -t king094/banking-and-finance:v1.0.0 .'
             }
         }
 
@@ -57,8 +57,8 @@ pipeline {
 
         stage('Push to DockerHub') {
             steps {
-                echo 'Pushing Docker image: king094/Banking-and-Finance:v1.0.0'
-                sh 'docker push king094/Banking-and-Finance:v1.0.0'
+                echo 'Pushing Docker image: king094/banking-and-finance:v1.0.0'
+                sh 'docker push king094/banking-and-finance:v1.0.0'
             }
         }
 
