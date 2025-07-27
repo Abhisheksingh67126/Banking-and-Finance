@@ -84,8 +84,7 @@ pipeline {
                         source ~/.bashrc &&
                           cd /home/ubuntu/terraform &&
                           /usr/local/bin/terraform init &&
-                          /usr/local/bin/terraform apply -auto-approve    
-                    '
+                          /usr/local/bin/terraform apply -auto-approve
                 '''
         }
     }
