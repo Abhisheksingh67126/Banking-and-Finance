@@ -80,11 +80,11 @@ pipeline {
                         scp -o StrictHostKeyChecking=no -r ./test ubuntu@43.205.191.131:$TERRAFORM_REMOTE_DIR
 
                         echo "Running Terraform remotely..."
-                        ssh -o StrictHostKeyChecking=no ubuntu@43.205.191.131 bash -c '
-                        ls -l $TERRAFORM_REMOTE_DIR
-                        cd $TERRAFORM_REMOTE_DIR &&
-                        terraform init &&
-                        terraform apply -auto-approve
+                        ssh -o StrictHostKeyChecking=no ubuntu@43.205.191.131 bash -c "
+                        source ~/.bashrc &&
+                          cd /home/ubuntu/terraform &&
+                          /usr/local/bin/terraform init &&
+                          /usr/local/bin/terraform apply -auto-approve    
                     '
                 '''
         }
