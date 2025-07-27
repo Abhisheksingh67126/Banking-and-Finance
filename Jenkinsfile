@@ -1,9 +1,9 @@
 pipeline {
     agent any
-    
+
     tools {
-    maven 'Maven3'
-    terraform 'terraform'
+        maven 'Maven3'
+        terraform 'terraform'
     }
 
     stages {
@@ -70,17 +70,22 @@ pipeline {
         stage('Run Test Pipeline from YAML') {
             steps {
                 script {
-                    def testPipeline = readYaml file: 'Jenkinsfile.yml'
-                    echo "Loaded test pipeline config: ${testPipeline}"
+                    try {
+                        def testPipeline = readYaml file: 'test/test-pipeline.yml'
+                        echo "Loaded test pipeline config: ${testPipeline}"
+                    } catch (err) {
+                        echo "Failed to load test YAML: ${err.message}"
+                        error("Stopping pipeline due to YAML read failure.")
+                    }
                 }
             }
         }
 
         stage('Create Infrastructure') {
             steps {
-                dir('test') {
+                dir('infra') {
                     echo 'Creating infrastructure with Terraform...'
-                    sh 'chmod 600 keypair-.pem'
+                    sh 'chmod 600 keypair.pem'
                     sh 'terraform init'
                     sh 'terraform validate'
                     sh 'terraform apply --auto-approve'
@@ -92,7 +97,7 @@ pipeline {
             steps {
                 ansiblePlaybook credentialsId: 'AnsibleCred',
                                 disableHostKeyChecking: true,
-                                inventory: 'test/Inventory',
+                                inventory: 'infra/inventory',
                                 playbook: 'ansible-playbook.yml'
             }
         }
