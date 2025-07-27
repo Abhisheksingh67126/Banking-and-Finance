@@ -3,89 +3,76 @@ pipeline {
 
     tools {
         maven 'Maven3'
-        terraform 'terraform'
+        terraform 'Terraform'
+    }
+
+    environment {
+        // This assumes 'aws-credentials' is of type "AWS Credentials"
+        AWS_ACCESS_KEY_ID     = credentials('aws-credentials')
+        AWS_SECRET_ACCESS_KEY = credentials('aws-credentials')
     }
 
     stages {
         stage('Checkout the Code from GitHub') {
             steps {
-                git url: 'https://github.com/Abhisheksingh67126/Banking-and-Finance'
-                echo 'Code checked out from GitHub.'
+                git url: 'https://github.com/Abhisheksingh67126/Banking-and-Finance', branch: 'master'
+                echo 'Checked out repository.'
             }
         }
 
-        stage('Code Compile') {
-            steps {
-                echo 'Starting compile...'
-                sh 'mvn compile'
-            }
-        }
-
-        stage('Code Testing') {
-            steps {
-                echo 'Running tests...'
-                sh 'mvn test'
+        stage('Code Compile & Test') {
+            parallel {
+                stage('Compile') {
+                    steps {
+                        sh 'mvn compile'
+                    }
+                }
+                stage('Test') {
+                    steps {
+                        sh 'mvn test'
+                    }
+                }
             }
         }
 
         stage('Quality Analysis (QA)') {
             steps {
-                echo 'Running code style checks...'
                 sh 'mvn checkstyle:checkstyle'
             }
         }
 
         stage('Package Application') {
             steps {
-                echo 'Packaging application...'
                 sh 'mvn package'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                echo 'Building Docker image: king094/banking-and-finance:v1.0.0'
                 sh 'docker build -t king094/banking-and-finance:v1.0.0 .'
             }
         }
 
         stage('Login to DockerHub') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    echo 'Logging into Docker Hub...'
-                    sh '''
-                        echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin
-                    '''
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials',
+                                                  usernameVariable: 'DOCKER_USERNAME',
+                                                  passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh 'echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin'
                 }
             }
         }
 
-        stage('Push to DockerHub') {
+        stage('Push Docker Image') {
             steps {
-                echo 'Pushing Docker image: king094/banking-and-finance:v1.0.0'
                 sh 'docker push king094/banking-and-finance:v1.0.0'
             }
         }
 
-        stage('Run Test Pipeline from YAML') {
+        stage('Create Test Infrastructure (Terraform)') {
             steps {
-                script {
-                    try {
-                        def testPipeline = readYaml file: 'test/test-pipeline.yml'
-                        echo "Loaded test pipeline config: ${testPipeline}"
-                    } catch (err) {
-                        echo "Failed to load test YAML: ${err.message}"
-                        error("Stopping pipeline due to YAML read failure.")
-                    }
-                }
-            }
-        }
-
-        stage('Create Infrastructure') {
-            steps {
-                dir('infra') {
-                    echo 'Creating infrastructure with Terraform...'
-                    sh 'chmod 600 keypair.pem'
+                dir('test') {
+                    sh 'chmod 600 KEY-PAIR-POC.pem'
                     sh 'terraform init'
                     sh 'terraform validate'
                     sh 'terraform apply --auto-approve'
@@ -97,7 +84,7 @@ pipeline {
             steps {
                 ansiblePlaybook credentialsId: 'AnsibleCred',
                                 disableHostKeyChecking: true,
-                                inventory: 'infra/inventory',
+                                inventory: 'test/Inventory',
                                 playbook: 'ansible-playbook.yml'
             }
         }
