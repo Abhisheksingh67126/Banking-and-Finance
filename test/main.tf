@@ -29,8 +29,4 @@ resource "aws_instance" "test-POC" {
   provisioner "local-exec" {
     command = "echo ${self.public_ip} > inventory"
   }
-
-  provisioner "local-exec" {
-    command = "ansible-playbook -i inventory ./ansible-playbook.yml"
-  }
 }
