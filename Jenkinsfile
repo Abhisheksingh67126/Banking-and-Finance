@@ -70,6 +70,14 @@ pipeline {
         '''
     }
 }
+        stage('Terraform Apply') {
+            steps {
+                sshagent(['my-ssh-key']) {
+                    sh "scp -r ./test ubuntu@43.205.191.131:${TERRAFORM_REMOTE_DIR}"
+                    sh "ssh ubuntu@43.205.191.131 'cd ${TERRAFORM_REMOTE_DIR} && terraform init && terraform apply -auto-approve'"
+                }
+            }
+        }
 
 }
     }
