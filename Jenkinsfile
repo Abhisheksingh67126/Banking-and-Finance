@@ -75,6 +75,9 @@ pipeline {
         stage('Terraform Apply') {
             steps {
                 sshagent(['my-ssh-key']) {
+                    withCredentials([usernamePassword(credentialsId: 'aws-credentials', 
+                                                  usernameVariable: 'AWS_ACCESS_KEY_ID', 
+                                                  passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                     sh '''
                         echo "Copying Terraform files to remote machine..."
                         scp -o StrictHostKeyChecking=no -r ./test ubuntu@43.205.191.131:$TERRAFORM_REMOTE_DIR
