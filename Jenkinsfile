@@ -3,7 +3,7 @@ pipeline {
 
 
     environment {
-        // This assumes 'aws-credentials' is of type "AWS Credentials"
+        // This assumes 'aws-credentials' is of type "AWS Credentials ooo"
         AWS_ACCESS_KEY_ID     = credentials('aws-credentials')
         AWS_SECRET_ACCESS_KEY = credentials('aws-credentials')
     }
