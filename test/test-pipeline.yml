@@ -85,7 +85,7 @@ pipeline {
             steps {
                 dir('infra') {
                     echo 'Creating infrastructure with Terraform...'
-                    sh 'chmod 600 keypair.pem'
+                    sh 'chmod 600 KEY-PAIR-POC.pem'
                     sh 'terraform init'
                     sh 'terraform validate'
                     sh 'terraform apply --auto-approve'
@@ -97,7 +97,7 @@ pipeline {
             steps {
                 ansiblePlaybook credentialsId: 'AnsibleCred',
                                 disableHostKeyChecking: true,
-                                inventory: 'infra/inventory',
+                                inventory: './inventory',
                                 playbook: 'ansible-playbook.yml'
             }
         }
