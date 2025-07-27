@@ -1,5 +1,10 @@
 pipeline {
     agent any
+    
+    tools {
+    maven 'Maven3'
+    terraform 'terraform'
+    }
 
     stages {
         stage('Checkout the Code from GitHub') {
