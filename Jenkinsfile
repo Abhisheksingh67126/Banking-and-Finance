@@ -45,8 +45,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sshagent(['my-ssh-key']) {
-                    sh "scp -r ./ ubuntu@docker-builder.example.com:${DOCKER_REMOTE_DIR}"
-                    sh "ssh ubuntu@docker-builder.example.com 'cd ${DOCKER_REMOTE_DIR} && docker build -t ${DOCKER_IMAGE} .'"
+                    sh "scp -r ./ ubuntu@13.126.118.224:${DOCKER_REMOTE_DIR}"
+                    sh "ssh ubuntu@13.126.118.224 'cd ${DOCKER_REMOTE_DIR} && docker build -t ${DOCKER_IMAGE} .'"
                 }
             }
         }
