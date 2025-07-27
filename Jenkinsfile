@@ -45,12 +45,14 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sshagent(['my-ssh-key']) {
+                    // Copy project to remote Docker builder
                     sh "scp -r ./ ubuntu@13.126.118.224:${DOCKER_REMOTE_DIR}"
-                    sh "ssh ubuntu@13.126.118.224 'cd ${DOCKER_REMOTE_DIR} && docker build -t ${DOCKER_IMAGE} .'"
+
+                    // SSH in and build Docker image (with correct variable expansion)
+                    sh "ssh ubuntu@13.126.118.224 \"cd ${DOCKER_REMOTE_DIR} && docker build -t ${DOCKER_IMAGE} .\""
                 }
             }
         }
-
         stage('Push Docker Image To Docker-Hub') {
             steps {
                 sshagent(['my-ssh-key']) {
