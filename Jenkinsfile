@@ -75,22 +75,25 @@ pipeline {
         stage('Terraform Apply') {
             steps {
                 sshagent(['my-ssh-key']) {
-                    withAWS('aws-credentials', region: 'ap-south-1'){
-                    sh '''
-                        echo "Copying Terraform files to remote machine..."
-                        scp -o StrictHostKeyChecking=no -r ./test ubuntu@43.205.191.131:$TERRAFORM_REMOTE_DIR
+                    withAWS(credentials: 'aws-credentials', region: 'ap-south-1') {
+                        sh '''
+                        echo "Copying Terraform config..."
+                        scp -o StrictHostKeyChecking=no -r ./test ubuntu@43.205.191.131:/home/ubuntu/terraform
 
                         echo "Running Terraform remotely..."
-                        ssh -o StrictHostKeyChecking=no ubuntu@43.205.191.131 bash -c "'
-                        source ~/.bashrc &&
-                          cd /home/ubuntu/terraform &&
-                          /usr/bin/terraform init &&
-                          /usr/bin/terraform apply -auto-approve
-                          '"
+                        ssh -o StrictHostKeyChecking=no ubuntu@43.205.191.131 '
+                        export AWS_ACCESS_KEY_ID='"$AWS_ACCESS_KEY_ID"'
+                        export AWS_SECRET_ACCESS_KEY='"$AWS_SECRET_ACCESS_KEY"'
+                        export AWS_SESSION_TOKEN='"$AWS_SESSION_TOKEN"'
+                        cd /home/ubuntu/terraform
+                        terraform init
+                        terraform apply -auto-approve
+                    '
                 '''
+            }
         }
     }
 }
-    }
+
 }
 }
