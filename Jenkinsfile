@@ -76,15 +76,20 @@ pipeline {
             steps {
                 sshagent(['my-ssh-key']) {
                     sh '''
+                        echo "Copying Terraform files to remote machine..."
                         scp -o StrictHostKeyChecking=no -r ./test ubuntu@43.205.191.131:$TERRAFORM_REMOTE_DIR
+
+                        echo "Running Terraform remotely..."
                         ssh -o StrictHostKeyChecking=no ubuntu@43.205.191.131 '
-                            cd $TERRAFORM_REMOTE_DIR &&
-                            terraform init &&
-                            terraform apply -auto-approve
-                        '
-                    '''
-                }
-            }
+                        ls -l $TERRAFORM_REMOTE_DIR
+                        cd $TERRAFORM_REMOTE_DIR &&
+                        terraform init &&
+                        terraform apply -auto-approve
+                    '
+                '''
         }
     }
+}
+    }
+}
 }
