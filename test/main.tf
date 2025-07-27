@@ -18,7 +18,7 @@ resource "aws_instance" "k8s-pro" {
   connection {
     type        = "ssh"
     user        = "ubuntu"
-    private_key = file("./exampl.pem")
+    private_key = file("./KEY-PAIR-POC.pem")
     host        = self.public_ip
   }
   
