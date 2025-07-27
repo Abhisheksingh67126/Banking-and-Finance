@@ -60,5 +60,19 @@ pipeline {
             }
         }
     }
+    stage ('docker push'){
+    steps{
+        sshagent(['my-ssh-key']){
+                     withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh """
+                        ssh ubuntu@13.126.118.224'
+                            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin && \
+                            docker push ${DOCKER_IMAGE} && \
+                            docker logout
+                        '
+                        """
+
+        }
+    }
 }
 }
