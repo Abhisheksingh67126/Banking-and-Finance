@@ -43,7 +43,8 @@ pipeline {
         }
 
         stage('Build Docker Image') {
-            steps {
+            steps{ 
+                sshagent(['my-ssh-key']){
                  sh '''
                 # Make a clean copy excluding .git folder
                 rm -rf temp_app
