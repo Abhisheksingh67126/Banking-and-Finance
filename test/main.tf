@@ -1,11 +1,11 @@
-resource "aws_instance" "k8s-pro" {
+resource "aws_instance" "test-POC" {
   ami                    = "ami-02eb7a4783e7e9317"
   instance_type          = "t2.medium"
   key_name               = "exampl"
   vpc_security_group_ids = ["sg-0dcfb1d7312730a94"]
 
   tags = {
-    Name = "k8s-pro"
+    Name = "Test-POC"
   }
   
   provisioner "remote-exec" {
@@ -23,10 +23,10 @@ resource "aws_instance" "k8s-pro" {
   }
   
   provisioner "local-exec" {
-    command = "echo ${aws_instance.k8s-pro.public_ip} > inventory"
+    command = "echo ${aws_instance.Test-POC.public_ip} > inventory"
   }
 
   provisioner "local-exec" {
-    command = "ansible-playbook /var/lib/jenkins/workspace/k8s-pro/k8s-pro/ansible-playbook.yml"
+    command = "ansible-playbook /var/lib/jenkins/workspace/ansible-playbook.yml"
   }
 }
