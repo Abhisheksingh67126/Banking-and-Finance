@@ -31,6 +31,6 @@ resource "aws_instance" "test-POC" {
   }
 
   provisioner "local-exec" {
-    command = "ansible-playbook -i inventory ansible-playbook.yml"
+    command = "ansible-playbook -i inventory ../ansible-playbook.yml"
   }
 }
