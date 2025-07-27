@@ -15,13 +15,13 @@ resource "aws_instance" "test-POC" {
       "sleep 60",
       "echo 'Instance ready.'"
     ]
-  }
 
-  connection {
-    type        = "ssh"
-    user        = "ubuntu"
-    private_key = file("./KEY-PAIR-POC.pem")
-    host        = self.public_ip
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"
+      private_key = file("./KEY-PAIR-POC.pem")
+      host        = self.public_ip
+    }
   }
 
   provisioner "local-exec" {
@@ -32,4 +32,3 @@ resource "aws_instance" "test-POC" {
     command = "ansible-playbook -i inventory ansible-playbook.yml"
   }
 }
-
