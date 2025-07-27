@@ -53,38 +53,5 @@ pipeline {
                 }
             }
         }
-        stage('Push Docker Image To Docker-Hub') {
-            steps {
-                sshagent(['my-ssh-key']) {
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                        sh """
-                        ssh ubuntu@docker-builder.example.com '
-                            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin && \
-                            docker push ${DOCKER_IMAGE} && \
-                            docker logout
-                        '
-                        """
-                    }
-                }
-            }
-        }
-
-        stage('Terraform Apply') {
-            steps {
-                sshagent(['my-ssh-key']) {
-                    sh "scp -r ./test ubuntu@terraform-node.example.com:${TERRAFORM_REMOTE_DIR}"
-                    sh "ssh ubuntu@terraform-node.example.com 'cd ${TERRAFORM_REMOTE_DIR} && terraform init && terraform apply -auto-approve'"
-                }
-            }
-        }
-
-        stage('Run Ansible Playbook') {
-            steps {
-                sshagent(['my-ssh-key']) {
-                    sh "scp -r ./ ubuntu@ansible-node.example.com:${ANSIBLE_REMOTE_DIR}"
-                    sh "ssh ubuntu@ansible-node.example.com 'cd ${ANSIBLE_REMOTE_DIR} && ansible-playbook -i test/Inventory ansible-playbook.yml'"
-                }
-            }
-        }
     }
 }
