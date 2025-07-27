@@ -2,7 +2,7 @@ resource "aws_instance" "test-POC" {
   ami                    = "ami-02eb7a4783e7e9317"
   instance_type          = "t2.medium"
   key_name               = "KEY-PAIR-POC"
-  vpc_security_group_ids = ["sg-0dcfb1d7312730a94"]
+  vpc_security_group_ids = ["sg-02fbc5cfbc10f52ef"]
 
   tags = {
     Name = "Test-POC"
