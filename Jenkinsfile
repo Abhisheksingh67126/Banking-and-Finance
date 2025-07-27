@@ -70,6 +70,7 @@ pipeline {
         '''
     }
 }
+       
         stage('Terraform Apply') {
             steps {
                 sshagent(['my-ssh-key']) {
@@ -83,7 +84,6 @@ pipeline {
                     '''
                 }
             }
-        }
          }
         }
  }
