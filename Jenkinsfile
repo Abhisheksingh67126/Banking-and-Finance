@@ -44,14 +44,20 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sshagent(['my-ssh-key']) {
-                    // Copy project to remote Docker builder
-                    sh "scp -o StrictHostKeyChecking=no -r ./ ubuntu@13.126.118.224:${DOCKER_REMOTE_DIR}"
-
-                    // SSH in and build Docker image (with correct variable expansion)
-                    sh "ssh ubuntu@13.126.118.224 \"cd ${DOCKER_REMOTE_DIR} && docker build -t ${DOCKER_IMAGE} .\""
-                }
+                 sh '''
+                # Make a clean copy excluding .git folder
+                rm -rf temp_app
+                mkdir temp_app
+                rsync -av --exclude='.git' ./ temp_app/
+                
+                # Copy to remote server
+                scp -o StrictHostKeyChecking=no -r temp_app ubuntu@13.126.118.224:/home/ubuntu/app
+                
+                # Build docker image remotely
+                ssh ubuntu@13.126.118.224 "cd /home/ubuntu/app && docker build -t ${DOCKER_IMAGE} ."
+            '''
             }
         }
     }
+}
 }
