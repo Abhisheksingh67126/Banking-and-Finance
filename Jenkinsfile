@@ -83,8 +83,8 @@ pipeline {
                         ssh -o StrictHostKeyChecking=no ubuntu@43.205.191.131 bash -c "'
                         source ~/.bashrc &&
                           cd /home/ubuntu/terraform &&
-                          /usr/local/bin/terraform init &&
-                          /usr/local/bin/terraform apply -auto-approve
+                          /usr/bin/terraform init &&
+                          /usr/bin/terraform apply -auto-approve
                           '"
                 '''
         }
