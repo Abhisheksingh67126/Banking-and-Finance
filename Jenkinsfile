@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    tools {
-        maven 'Maven3'
-        terraform 'Terraform'
-    }
 
     environment {
         // This assumes 'aws-credentials' is of type "AWS Credentials"
