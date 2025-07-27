@@ -25,8 +25,3 @@ resource "aws_instance" "test-POC" {
       host        = self.public_ip
     }
   }
-
-  provisioner "local-exec" {
-    command = "echo ${self.public_ip} > inventory"
-  }
-}
