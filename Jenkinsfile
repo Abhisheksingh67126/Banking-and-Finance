@@ -6,6 +6,8 @@ pipeline {
         DOCKER_REMOTE_DIR = '/home/ubuntu/app'
         TERRAFORM_REMOTE_DIR = '/home/ubuntu/terraform'
         ANSIBLE_REMOTE_DIR = '/home/ubuntu/ansible'
+        AWS_ACCESS_KEY_ID = credentials('aws-access-key-id')
+        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
     }
 
     stages {
@@ -72,26 +74,15 @@ pipeline {
         stage('Terraform Apply') {
             steps {
                 sshagent(['my-ssh-key']) {
-                    withCredentials([
-                    [$class: 'AmazonWebServicesCredentialsBinding', 
-                     credentialsId: 'aws-credentials', 
-                     accessKeyVariable: 'AWS_ACCESS_KEY_ID', 
-                     secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']
-                ]) {
                     sh '''
-                        ssh -o StrictHostKeyChecking=no ubuntu@43.205.191.131 << EOF
-                        export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
-                        export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
-                        cd $TERRAFORM_REMOTE_DIR
-                        terraform init
-                        terraform apply -auto-approve
-                    EOF
-                '''
+                        ssh -o StrictHostKeyChecking=no ubuntu@3.108.61.214 "
+                        AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+                        terraform init && terraform plan && terraform apply -auto-approve
+                        "
+                        '''
+                        }
+                    }
+                }
             }
         }
     }
-}
-
-
-}
-}
