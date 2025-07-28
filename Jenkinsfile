@@ -46,11 +46,9 @@ pipeline {
             steps {
                 sshagent(['my-ssh-key']) {
                     sh '''
-                        rm -rf temp_app
-                        mkdir temp_app
-                        rsync -av --exclude='.git' ./ temp_app/
-                        scp -o StrictHostKeyChecking=no -r temp_app ubuntu@13.126.118.224:/home/ubuntu/app
-                        ssh ubuntu@13.126.118.224 "cd /home/ubuntu/app && docker build -t ${DOCKER_IMAGE} ."
+                        mkdir -p temp_app
+                        scp -o StrictHostKeyChecking=no target/*.jar Dockerfile ubuntu@13.127.138.213:/home/ubuntu/app/
+                        ssh ubuntu@13.127.138.213 "cd /home/ubuntu/app && docker build -t ${DOCKER_IMAGE} ."
                     '''
                 }
             }
@@ -61,10 +59,9 @@ pipeline {
                 sshagent(['my-ssh-key']) {
                     withCredentials([string(credentialsId: 'docker-hub-password', variable: 'DOCKER_PASSWORD')]) {
                         sh '''
-                            ssh -o StrictHostKeyChecking=no ubuntu@13.126.118.224 bash -c "'
+                            ssh -o StrictHostKeyChecking=no ubuntu@13.127.138.213 bash -c "'
                                 echo \\"$DOCKER_PASSWORD\\" | docker login -u king094 --password-stdin &&
-                                docker push king094/banking-and-finance:v1.0.0 &&
-                                docker logout
+                                docker push king094/banking-and-finance:v1.0.0 && docker logout
                             '"
                         '''
                     }
@@ -82,10 +79,6 @@ pipeline {
                      secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']
                 ]) {
                     sh '''
-                        echo "Copying Terraform files to remote machine..."
-                        scp -o StrictHostKeyChecking=no -r ./test ubuntu@43.205.191.131:$TERRAFORM_REMOTE_DIR
-
-                        echo "Running Terraform remotely..."
                         ssh -o StrictHostKeyChecking=no ubuntu@43.205.191.131 << EOF
                         export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
                         export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
