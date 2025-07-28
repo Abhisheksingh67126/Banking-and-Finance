@@ -79,7 +79,7 @@ pipeline {
                         cd ${TERRAFORM_REMOTE_DIR} &&
                         ls -l
                         AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
-                        terraform init
+                        terraform init &&
                         terraform apply -auto-approve
                         "
                         '''
