@@ -76,8 +76,11 @@ pipeline {
                 sshagent(['my-ssh-key']) {
                     sh '''
                         ssh -o StrictHostKeyChecking=no ubuntu@3.108.61.214 "
+                        cd ${TERRAFORM_REMOTE_DIR} &&
+                        ls -l
                         AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
-                        terraform init && terraform plan && terraform apply -auto-approve
+                        terraform init
+                        terraform apply -auto-approve
                         "
                         '''
                         }
