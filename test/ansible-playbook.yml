@@ -19,4 +19,4 @@
       ignore_errors: yes
 
     - name: Deploy Docker Container
-      command: docker run -itd --name banking-container -p 8084:8081 king094/banking-and-finance:v1.0.0.0
+      command: docker run -itd --name banking-container -p 8081:8081 king094/banking-and-finance:v1.0.0.0
