@@ -1,4 +1,4 @@
-resource "aws_instance" "test-POC" {
+resource "aws_instance" "test_poc" {
   ami                         = "ami-02eb7a4783e7e9317"
   instance_type               = "t2.medium"
   key_name                    = "KEY-PAIR-POC"
@@ -24,4 +24,9 @@ resource "aws_instance" "test-POC" {
       host        = self.public_ip
     }
   }
+}
+
+output "test_server_ip" {
+  description = "Public IP of the Test POC EC2 instance"
+  value       = aws_instance.test_poc.public_ip
 }
