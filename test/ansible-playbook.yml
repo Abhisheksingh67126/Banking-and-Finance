@@ -12,5 +12,9 @@
   - name : Start Docker Service
     command : sudo systemctl start docker
 
-  - name: Deploy Docker Container
-    command: docker run -itd -p 8084:8081 king094/banking-and-finance:v1.0.0.0
+  - name: Stop old container if exists
+  shell: docker rm -f banking-container || true
+
+- name: Run new container
+  shell: docker run -d --name banking-container -p 8084:8081 king094/banking-and-finance:v1.0.0.0
+
