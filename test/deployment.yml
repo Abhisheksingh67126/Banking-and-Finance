@@ -2,38 +2,39 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: medicure
+  name: banking
   labels:
-    app: medicure
+    app: banking
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: medicure
+      app: banking
   template:
     metadata:
       labels:
-        app: medicure
+        app: banking
     spec:
       containers:
-        - name: medicure-container
-          image: kranthi619/med-pro
+        - name: banking-container
+          image: king094/banking-and-finance:v1.0.0.0
+
           ports:
             - containerPort: 8080
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: medicure-service
+  name: banking-service
   labels:
-    app: medicure
+    app: banking
 spec:
   selector:
-    app: medicure
+    app: banking
   type: NodePort
   ports:
     - nodePort: 31000
-      port: 8082
-      targetPort: 8082
+      port: 8081
+      targetPort: 8081
 
 
