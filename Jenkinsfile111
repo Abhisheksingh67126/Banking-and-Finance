@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout Code') {
+        stage('Checkout Code 1') {
             steps {
                 git url: 'https://github.com/Abhisheksingh67126/Banking-and-Finance.git', branch: 'master'
             }
