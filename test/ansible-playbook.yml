@@ -15,8 +15,8 @@
       command: systemctl start docker
 
     - name: Stop old container if exists
-      command: docker rm -f banking-container
+      command: docker rm -f healthcare-container
       ignore_errors: yes
 
     - name: Deploy Docker Container
-      command: docker run -itd --name banking-container -p 8081:8081 king094/banking-and-finance:v1.0.0.0
+      command: docker run -itd --name healthcare-container -p 8082:8082 king094/healthcare-project:v1.0.0
